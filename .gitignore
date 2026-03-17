@@ -1,0 +1,4 @@
+.env
+requirements.txt
+__pycache__/ai_parser.cpython-314.pyc
+__pycache__/decision.cpython-314.pyc
