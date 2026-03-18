@@ -159,6 +159,7 @@ def run_tests(test_cases):
             assert result == case["expected"]
             print(f"{case_name} Passed \n")
             passed += 1
+            
         except AssertionError:
             print(f"{case_name} Fail \n")
             print(f"Expected: {case['expected']}")

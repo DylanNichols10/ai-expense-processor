@@ -1,4 +1,18 @@
+# Environment variables
 .env
-requirements.txt
-__pycache__/ai_parser.cpython-314.pyc
-__pycache__/decision.cpython-314.pyc
+.env.*
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.env/
+
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
