@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 
 from ai_parser import extract_invoice
 from decision import make_decision
@@ -8,6 +9,8 @@ from decision import make_decision
 LOG_LEVEL = os.getenv("LOG_LEVEL", "WARNING").upper()
 logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
+
+OLLAMA_URL = os.getenv("OLLAMA_URL") #Typically http://localhost:11434/api/generate if running locally
 
 test_cases = {
     "legit_1": {
@@ -109,14 +112,19 @@ test_cases = {
 def main(case):
 
     text = case["text"]
-
-    ai_output = extract_invoice(text)
+    ai_output = extract_invoice(text,OLLAMA_URL)
     logger.debug("AI Output: %s", ai_output)
+
     try:
         ai_output = json.loads(ai_output)
     except json.JSONDecodeError:
         logger.error("Failed to decode AI output as JSON. Raw output: %s", ai_output)
-        return {"exception": "parse_error"}
+        cleaned_text = ai_output.strip().replace("'",'"') # Attempt to repair common LLM JSON formatting issues before failing
+        cleaned_text = re.sub(r'(?<=\{|,)\s*(\w+):', r'"\1":', cleaned_text)
+        try:
+            return json.loads(cleaned_text)
+        except json.JSONDecodeError:
+            return {"exception": "parse_error"}
 
     if not isinstance(ai_output, dict):
         logger.error("Parsed output is not a JSON object. Skipping decision step.")
@@ -131,11 +139,11 @@ def main(case):
         return ai_output
 
     if not ai_output.get("vendor") or not ai_output.get("category") or ai_output.get("amount") is None:
-        logger.warning("Extraction failed validation: missing required fields.")
+        logger.warning("Extraction failed validation: missing required fields. Raw output: %s", ai_output)
         return {}
 
     if not isinstance(ai_output.get("amount"), (int, float)):
-        logger.warning("Extraction failed validation: amount is not numeric.")
+        logger.warning("Extraction failed validation: amount is not numeric. Raw output: %s", ai_output)
         return {}
     
     logger.debug("Decision result: %s", make_decision(ai_output))
@@ -149,10 +157,10 @@ def run_tests(test_cases):
         try:
             result = main(case)
             assert result == case["expected"]
-            print(f"{case_name} ✅")
+            print(f"{case_name} Passed \n")
             passed += 1
         except AssertionError:
-            print(f"{case_name} ❌")
+            print(f"{case_name} Fail \n")
             print(f"Expected: {case['expected']}")
             print(f"Got:      {result}")
             failed += 1
