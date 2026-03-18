@@ -1,3 +1,4 @@
 ollama installed locally - https://ollama.com/download/windows
 
-Follow https://www.doroch.com/post/ai-on-amd-radeon-rx-9000-local-llm-ollama-rocm-gpt-oss-qwen3/ if you want to use a 9000 series AMD GPU.
+Took me a while to figure out why it was only using my local CPU and not utilising my GPU.
+Found this resource: https://www.doroch.com/post/ai-on-amd-radeon-rx-9000-local-llm-ollama-rocm-gpt-oss-qwen3/ if you want to use a 9000 series AMD GPU, full credit to author.
