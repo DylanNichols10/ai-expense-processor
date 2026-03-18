@@ -5,7 +5,7 @@ llama3.2:3b is used via Ollama to extract structured data from invoice text. Run
 
 The goal is not extraction itself, but building a framework that can safely consume and validate probabilistic outputs.
 
-Lower model quality is intentional here — it exposes failures (invalid JSON, partial extraction, instruction drift) that need to be handled in real-world systems.
+Lower model quality is intentional here — it exposes failures (invalid JSON, partial extraction, instruction drift) that need to be handled in more complex real-world systems.
 Furthermore, it also proves that even small models can be made quite security aware if prompted correctly.
 
 Results:
